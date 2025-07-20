@@ -12,6 +12,7 @@ import { GetAccountsUseCase } from '../application/use-cases/accounts/get-accoun
 import { NodeConfigAdapter } from '../infrastructure/inbound/configuration/node-config.adapter.js';
 import { GetAccountsController } from '../infrastructure/inbound/server/accounts/get-accounts.controller.js';
 import { HonoServerAdapter } from '../infrastructure/inbound/server/hono.adapter.js';
+import { ExampleAgentAdapter } from '../infrastructure/outbound/agents/example.agent.js';
 import { InMemoryAccountAdapter } from '../infrastructure/outbound/persistence/accounts/in-memory-account.adapter.js';
 
 /**
@@ -34,8 +35,7 @@ const modelFactory = Injectable(
         new OpenRouterAdapter({
             apiKey: config.getOutboundConfiguration().openRouter.apiKey,
             metadata: {
-                application: 'jterrazz-agents',
-                website: 'https://jterrazz.com',
+                application: 'learning-ai',
             },
             modelName: 'google/gemini-2.5-flash-lite-preview-06-17',
         }),
@@ -44,6 +44,12 @@ const modelFactory = Injectable(
 const accountRepositoryFactory = Injectable(
     'AccountRepository',
     () => new InMemoryAccountAdapter(),
+);
+
+const exampleAgentFactory = Injectable(
+    'ExampleAgent',
+    ['Model', 'Logger'] as const,
+    (model: ModelPort, logger: LoggerPort) => new ExampleAgentAdapter(model, logger),
 );
 
 /**
@@ -94,6 +100,7 @@ export const createContainer = () =>
         .provides(loggerFactory)
         .provides(modelFactory)
         .provides(accountRepositoryFactory)
+        .provides(exampleAgentFactory)
         // Use cases
         .provides(getAccountsUseCaseFactory)
         // Controllers and tasks
