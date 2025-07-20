@@ -1,0 +1,7 @@
+inbound:
+  logger:
+    level: LOG_LEVEL
+
+outbound:
+  openRouter:
+    apiKey: OPENROUTER_API_KEY
