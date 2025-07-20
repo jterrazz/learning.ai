@@ -5,6 +5,11 @@ import { type Account } from '../../../../domain/account.entity.js';
  */
 export interface AccountRepositoryPort {
     /**
+     * Delete an account by its identifier
+     */
+    delete(id: string): Promise<void>;
+
+    /**
      * Find accounts matching the given criteria
      */
     findMany(options: FindManyOptions): Promise<Account[]>;

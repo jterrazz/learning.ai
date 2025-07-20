@@ -7,9 +7,11 @@ import type { ConfigurationPort } from '../application/ports/inbound/configurati
 
 import type { ServerPort } from '../application/ports/inbound/server.port.js';
 import { type AccountRepositoryPort } from '../application/ports/outbound/persistence/account-repository.port.js';
+import { DeleteAccountUseCase } from '../application/use-cases/accounts/delete-account.use-case.js';
 import { GetAccountsUseCase } from '../application/use-cases/accounts/get-accounts.use-case.js';
 
 import { NodeConfigAdapter } from '../infrastructure/inbound/configuration/node-config.adapter.js';
+import { DeleteAccountController } from '../infrastructure/inbound/server/accounts/delete-account.controller.js';
 import { GetAccountsController } from '../infrastructure/inbound/server/accounts/get-accounts.controller.js';
 import { HonoServerAdapter } from '../infrastructure/inbound/server/hono.adapter.js';
 import { ExampleAgentAdapter } from '../infrastructure/outbound/agents/example.agent.js';
@@ -61,13 +63,20 @@ const getAccountsUseCaseFactory = Injectable(
     (accountRepository: AccountRepositoryPort) => new GetAccountsUseCase(accountRepository),
 );
 
+const deleteAccountUseCaseFactory = Injectable(
+    'DeleteAccount',
+    ['AccountRepository'] as const,
+    (accountRepository: AccountRepositoryPort) => new DeleteAccountUseCase(accountRepository),
+);
+
 /**
  * Controller factories
  */
 const controllersFactory = Injectable(
     'Controllers',
-    ['GetAccounts'] as const,
-    (getAccounts: GetAccountsUseCase) => ({
+    ['GetAccounts', 'DeleteAccount'] as const,
+    (getAccounts: GetAccountsUseCase, deleteAccount: DeleteAccountUseCase) => ({
+        deleteAccount: new DeleteAccountController(deleteAccount),
         getAccounts: new GetAccountsController(getAccounts),
     }),
 );
@@ -83,9 +92,16 @@ const configurationFactory = Injectable(
 const serverFactory = Injectable(
     'Server',
     ['Logger', 'Controllers'] as const,
-    (logger: LoggerPort, controllers: { getAccounts: GetAccountsController }): ServerPort => {
+    (
+        logger: LoggerPort,
+        controllers: { deleteAccount: DeleteAccountController; getAccounts: GetAccountsController },
+    ): ServerPort => {
         logger.info('Initializing Server', { implementation: 'Hono' });
-        const server = new HonoServerAdapter(logger, controllers.getAccounts);
+        const server = new HonoServerAdapter(
+            logger,
+            controllers.getAccounts,
+            controllers.deleteAccount,
+        );
         return server;
     },
 );
@@ -103,6 +119,7 @@ export const createContainer = () =>
         .provides(exampleAgentFactory)
         // Use cases
         .provides(getAccountsUseCaseFactory)
+        .provides(deleteAccountUseCaseFactory)
         // Controllers and tasks
         .provides(controllersFactory)
         // Inbound adapters

@@ -5,7 +5,7 @@ import { Account } from '../../../../domain/account.entity.js';
 
 import { type AccountRepositoryPort } from '../../../ports/outbound/persistence/account-repository.port.js';
 
-import { type GetAccountsParams,GetAccountsUseCase } from '../get-accounts.use-case.js';
+import { type GetAccountsParams, GetAccountsUseCase } from '../get-accounts.use-case.js';
 
 describe('GetAccountsUseCase', () => {
     let repository: DeepMockProxy<AccountRepositoryPort>;

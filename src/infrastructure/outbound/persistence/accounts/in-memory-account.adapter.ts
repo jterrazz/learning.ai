@@ -40,6 +40,17 @@ export class InMemoryAccountAdapter implements AccountRepositoryPort {
     }
 
     /**
+     * Deletes an account matching the provided identifier.
+     */
+    public async delete(id: string): Promise<void> {
+        const index = this.records.findIndex((record) => record.iban === id);
+
+        if (index !== -1) {
+            this.records.splice(index, 1);
+        }
+    }
+
+    /**
      * Finds accounts that match the optional filter criteria.
      *
      * Currently supports filtering by currency and will silently ignore unsupported options.
