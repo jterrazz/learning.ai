@@ -6,7 +6,7 @@ export const createAccountsRouter = (getAccountsController: GetAccountsControlle
     const app = new Hono();
 
     // GET /accounts
-    app.get('/accounts', async (c) => {
+    app.get('/', async (c) => {
         const query = c.req.query();
 
         const response = await getAccountsController.getAccounts({

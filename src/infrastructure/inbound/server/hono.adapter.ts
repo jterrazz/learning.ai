@@ -55,6 +55,6 @@ export class HonoServerAdapter implements ServerPort {
     }
 
     private registerRoutes(): void {
-        this.app.route('/', createAccountsRouter(this.getAccountsController));
+        this.app.route('/accounts', createAccountsRouter(this.getAccountsController));
     }
 }
