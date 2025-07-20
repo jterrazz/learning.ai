@@ -26,7 +26,7 @@ export class ExampleAgentAdapter implements ExampleAgentPort {
         PROMPT_LIBRARY.FOUNDATIONS.CONTEXTUAL_ONLY,
     );
 
-    public readonly name = 'ArticleCompositionAgent';
+    public readonly name = 'ExampleAgent';
 
     private readonly agent: BasicAgentAdapter<z.infer<typeof ExampleAgentAdapter.SCHEMA>>;
 
