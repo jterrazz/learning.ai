@@ -23,7 +23,7 @@ _L'idée c'est de vous montrer à travers un projet qu'on va faire ensemble, com
 
 => New experience
 => Build software faster
-
+ 
 
 # GENERIC TITLE: HOW ASSISTED AI WILL IMPROVE YOU
 
