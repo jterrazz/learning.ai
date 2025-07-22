@@ -6,9 +6,11 @@ import {
     type ServerConfiguration,
     type ServerPort,
 } from '../../../application/ports/inbound/server.port.js';
+import { type AccountRepositoryPort } from '../../../application/ports/outbound/persistence/account-repository.port.js';
 
 import { createAccountsRouter } from './accounts/accounts.routes.js';
 import { type GetAccountsController } from './accounts/get-accounts.controller.js';
+import { createHealthCheckRouter } from './health/health.routes.js';
 
 export class HonoServerAdapter implements ServerPort {
     private app: Hono;
@@ -17,6 +19,7 @@ export class HonoServerAdapter implements ServerPort {
     constructor(
         private readonly logger: LoggerPort,
         private readonly getAccountsController: GetAccountsController,
+        private readonly accountsRepository: AccountRepositoryPort,
     ) {
         this.app = new Hono();
         this.registerRoutes();
@@ -55,6 +58,7 @@ export class HonoServerAdapter implements ServerPort {
     }
 
     private registerRoutes(): void {
+        this.app.route('/', createHealthCheckRouter(this.accountsRepository));
         this.app.route('/accounts', createAccountsRouter(this.getAccountsController));
     }
 }

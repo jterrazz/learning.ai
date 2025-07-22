@@ -82,10 +82,14 @@ const configurationFactory = Injectable(
 
 const serverFactory = Injectable(
     'Server',
-    ['Logger', 'Controllers'] as const,
-    (logger: LoggerPort, controllers: { getAccounts: GetAccountsController }): ServerPort => {
+    ['Logger', 'Controllers', 'AccountRepository'] as const,
+    (
+        logger: LoggerPort,
+        controllers: { getAccounts: GetAccountsController },
+        accountsRepository: AccountRepositoryPort,
+    ): ServerPort => {
         logger.info('Initializing Server', { implementation: 'Hono' });
-        const server = new HonoServerAdapter(logger, controllers.getAccounts);
+        const server = new HonoServerAdapter(logger, controllers.getAccounts, accountsRepository);
         return server;
     },
 );
