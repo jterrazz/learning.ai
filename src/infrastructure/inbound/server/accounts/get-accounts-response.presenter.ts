@@ -1,6 +1,7 @@
 import { type GetAccountsResult } from '../../../../application/use-cases/accounts/get-accounts.use-case.js';
 
 import { type Account } from '../../../../domain/account.entity.js';
+import { type Transaction } from '../../../../domain/transaction.entity.js';
 
 type HttpAccount = {
     balance: number;
@@ -9,10 +10,20 @@ type HttpAccount = {
     currency: string;
     iban: string;
     name: string;
+    transactions: HttpTransaction[];
 };
 
 type HttpAccountResponse = {
     accounts: HttpAccount[];
+};
+
+type HttpTransaction = {
+    amount: number;
+    category?: string;
+    currency: string;
+    date: string;
+    description: string;
+    id: string;
 };
 
 /**
@@ -21,8 +32,8 @@ type HttpAccountResponse = {
  */
 export class GetAccountsResponsePresenter {
     present(result: GetAccountsResult): HttpAccountResponse {
-        const accounts: HttpAccount[] = result.accounts.map((account: Account) =>
-            this.mapAccountToResponse(account),
+        const accounts: HttpAccount[] = result.accounts.map((item) =>
+            this.mapAccountWithTransactionsToResponse(item.account, item.transactions),
         );
 
         return {
@@ -30,7 +41,10 @@ export class GetAccountsResponsePresenter {
         };
     }
 
-    private mapAccountToResponse(account: Account): HttpAccount {
+    private mapAccountWithTransactionsToResponse(
+        account: Account,
+        transactions: Transaction[],
+    ): HttpAccount {
         return {
             balance: account.balance,
             bic: account.bic,
@@ -38,6 +52,18 @@ export class GetAccountsResponsePresenter {
             currency: account.currency,
             iban: account.iban,
             name: account.name,
+            transactions: transactions.map(this.mapTransactionToResponse),
+        };
+    }
+
+    private mapTransactionToResponse(transaction: Transaction): HttpTransaction {
+        return {
+            amount: transaction.amount,
+            category: transaction.category,
+            currency: transaction.currency,
+            date: transaction.date,
+            description: transaction.description,
+            id: transaction.id,
         };
     }
 }
